@@ -28,6 +28,9 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Roster Assignment",
   description: "Roster planner",
+  icons: {
+    icon: "/assets/logo.svg",
+  },
 };
 
 export default function RootLayout({

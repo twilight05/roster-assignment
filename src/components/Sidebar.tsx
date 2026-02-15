@@ -78,7 +78,7 @@ export default function Sidebar() {
         mb="16px"
       >
         <Image
-          src="/assets/Group 2085660774.svg"
+          src="/assets/logo.svg"
           alt="Excellent Care Clinics"
           width={130}
           height={32}
