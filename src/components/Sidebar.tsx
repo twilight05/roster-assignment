@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Box, Flex, Text } from "@chakra-ui/react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -76,47 +77,27 @@ export default function Sidebar() {
       flexDirection="column"
       overflowY="auto"
     >
-      {/* Logo */}
       <Flex
         align="center"
-        px="20px"
-        py="20px"
-        gap="12px"
-        borderBottom="1px solid #F0F4F8"
+        w="228px"
+        h="39px"
+        justifyContent="space-between"
+        mt="24px"
+        ml="21px"
+        mb="16px"
       >
-        <Box
-          w="40px"
-          h="40px"
-          borderRadius="50%"
-          bg="linear-gradient(135deg, #7B6FE8, #A78BFA)"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          flexShrink={0}
-        >
-          <Text color="white" fontWeight="700" fontSize="18px">
-            C
-          </Text>
-        </Box>
-        <Box flex="1" minW={0}>
-          <Text
-            fontSize="12px"
-            fontWeight="700"
-            color="#1A1A2E"
-            lineHeight="1.3"
-          >
-            excellent care
-          </Text>
-          <Text fontSize="11px" fontWeight="400" color="#8492A6" lineHeight="1.3">
-            clinics
-          </Text>
-        </Box>
+        <Image
+          src="/assets/Group 2085660774.svg"
+          alt="Excellent Care Clinics"
+          width={130}
+          height={32}
+          priority
+        />
         <Box cursor="pointer" flexShrink={0} color="#8492A6">
           <HamburgerMenu size={20} />
         </Box>
       </Flex>
 
-      {/* Navigation */}
       <Box flex="1" py="12px">
         {navItems.map((item) => {
           const Icon = item.icon;
