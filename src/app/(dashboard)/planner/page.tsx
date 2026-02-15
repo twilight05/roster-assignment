@@ -2,160 +2,104 @@
 
 import React from "react";
 import { Box, Flex, Text } from "@chakra-ui/react";
-import { Filter, Lock, Add, ArrowLeft2, ArrowRight2 } from "iconsax-reactjs";
+import { Filter, Add, ArrowLeft2, ArrowRight2, People } from "iconsax-reactjs";
 import { LuChevronDown } from "react-icons/lu";
+import TimeColumn from "@/components/planner/TimeColumn";
+import DepartmentColumn from "@/components/planner/DepartmentColumn";
+import type { CardData } from "@/components/planner/DepartmentColumn";
 
-interface Appointment {
-  id: string;
-  column: number;
-  startSlot: number;
-  spanSlots: number;
-  title: string;
-  time: string;
-  staff: string;
-  tag: string;
-  tagColor: string;
-  bgColor: string;
-  borderColor: string;
-}
+const SLOT_MINUTES = 30;
+const SLOT_HEIGHT = 120;
 
-const appointments: Appointment[] = [
-  {
-    id: "1",
-    column: 0,
-    startSlot: 0,
-    spanSlots: 3,
-    title: "Surgery",
-    time: "11:00 - 13:00",
-    staff: "Hakan de Gast",
-    tag: "HG",
-    tagColor: "#10B981",
-    bgColor: "#F0FDF4",
-    borderColor: "#86EFAC",
-  },
-  {
-    id: "2",
-    column: 1,
-    startSlot: 0,
-    spanSlots: 2,
-    title: "Pijnspecialist",
-    time: "11:00 - 12:00",
-    staff: "Diana Larte",
-    tag: "DL",
-    tagColor: "#F59E0B",
-    bgColor: "#FFFBEB",
-    borderColor: "#FCD34D",
-  },
-  {
-    id: "3",
-    column: 2,
-    startSlot: 1,
-    spanSlots: 2,
-    title: "Pijnspecialist",
-    time: "11:30 - 13:30",
-    staff: "Diana Larte",
-    tag: "HG",
-    tagColor: "#3B82F6",
-    bgColor: "#EFF6FF",
-    borderColor: "#93C5FD",
-  },
-  {
-    id: "4",
-    column: 3,
-    startSlot: 0,
-    spanSlots: 2,
-    title: "Pijnspecialist",
-    time: "16:00 - 00:00",
-    staff: "",
-    tag: "HG",
-    tagColor: "#EF4444",
-    bgColor: "#FEF2F2",
-    borderColor: "#FCA5A5",
-  },
-  {
-    id: "5",
-    column: 4,
-    startSlot: 0,
-    spanSlots: 2,
-    title: "Pijnspecialist",
-    time: "11:30 - 13:30",
-    staff: "Diana Larte",
-    tag: "HG",
-    tagColor: "#EF4444",
-    bgColor: "#FEF2F2",
-    borderColor: "#FCA5A5",
-  },
-  {
-    id: "6",
-    column: 2,
-    startSlot: 4,
-    spanSlots: 2,
-    title: "Pijnspecialist",
-    time: "13:00 - 15:00",
-    staff: "Halco de Gast",
-    tag: "HG",
-    tagColor: "#8B5CF6",
-    bgColor: "#F5F3FF",
-    borderColor: "#C4B5FD",
-  },
-];
+const GRID_START_MIN = 11 * 60; // 11:00
+const GRID_END_MIN = 16 * 60; // 16:00
+const TOTAL_SLOTS = Math.floor((GRID_END_MIN - GRID_START_MIN) / SLOT_MINUTES);
 
-const columns = [
-  "Days",
+const departments = [
   "Behandelingskamer1",
   "Management",
   "Bijzonderheden-Verlof-Cursus-...",
   "Financien",
 ];
 
-const timeSlots = ["11:00", "11:30", "12:00", "12:30", "13:00", "13:30"];
-
-function AppointmentCard({ appt }: { appt: Appointment }) {
-  return (
-    <Box
-      position="absolute"
-      top={`${appt.startSlot * 80}px`}
-      left="4px"
-      right="4px"
-      height={`${appt.spanSlots * 80 - 8}px`}
-      bg={appt.bgColor}
-      border={`1px solid ${appt.borderColor}`}
-      borderLeft={`3px solid ${appt.borderColor}`}
-      borderRadius="6px"
-      p="8px"
-      overflow="hidden"
-      cursor="pointer"
-      transition="box-shadow 0.15s"
-      _hover={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
-      zIndex={2}
-    >
-      <Flex align="center" gap="6px" mb="4px">
-        <Box
-          px="6px"
-          py="1px"
-          borderRadius="4px"
-          bg={appt.tagColor}
-          flexShrink={0}
-        >
-          <Text fontSize="10px" fontWeight="700" color="white">
-            {appt.tag}
-          </Text>
-        </Box>
-      </Flex>
-      <Text fontSize="12px" fontWeight="600" color="#1A1A2E" lineHeight="1.3">
-        {appt.title}
-      </Text>
-      <Text fontSize="11px" color="#8492A6" mt="2px">
-        {appt.time}
-      </Text>
-      {appt.staff && (
-        <Text fontSize="11px" color="#3B82F6" mt="2px">
-          {appt.staff}
-        </Text>
-      )}
-    </Box>
-  );
-}
+const scheduleData: Record<number, CardData[]> = {
+  0: [
+    {
+      id: "1",
+      title: "Surgery",
+      startMin: 660,
+      endMin: 780,
+      staff: "Hakan de Gast",
+      tag: "HG",
+      tagColor: "#E35F00",
+      bgColor: "#FDF5F0",
+      borderColor: "#FDBA74",
+      subColumn: "left",
+    },
+    {
+      id: "2",
+      title: "Pijnspecialist",
+      startMin: 660,
+      endMin: 810,
+      staff: "Diana Larte",
+      tag: "DL",
+      tagColor: "#19C34C",
+      bgColor: "#F1FBF4",
+      borderColor: "#86EFAC",
+      subColumn: "right",
+    },
+  ],
+  1: [
+    {
+      id: "3",
+      title: "Pijnspecialist",
+      startMin: 690,
+      endMin: 810,
+      staff: "Diana Larte",
+      tag: "HG",
+      tagColor: "#3B82F6",
+      bgColor: "#EFF6FF",
+      borderColor: "#93C5FD",
+    },
+    {
+      id: "6",
+      title: "Pijnspecialist",
+      startMin: 780,
+      endMin: 900,
+      staff: "Halco de Gast",
+      tag: "HG",
+      tagColor: "#8B5CF6",
+      bgColor: "#F5F3FF",
+      borderColor: "#C4B5FD",
+    },
+  ],
+  2: [
+    {
+      id: "4",
+      title: "Pijnspecialist",
+      startMin: 660,
+      endMin: 720,
+      staff: "",
+      tag: "HG",
+      tagColor: "#EF4444",
+      bgColor: "#FEF2F2",
+      borderColor: "#FCA5A5",
+    },
+  ],
+  3: [
+    {
+      id: "5",
+      title: "Pijnspecialist",
+      startMin: 690,
+      endMin: 810,
+      staff: "Diana Larte",
+      tag: "HG",
+      tagColor: "#EF4444",
+      bgColor: "#FEF2F2",
+      borderColor: "#FCA5A5",
+    },
+  ],
+};
 
 export default function PlannerPage() {
   return (
@@ -178,6 +122,7 @@ export default function PlannerPage() {
         >
           Planner
         </Text>
+
         <Flex gap="12px" alignItems="center">
           <Flex
             as="button"
@@ -203,6 +148,7 @@ export default function PlannerPage() {
               Open Days
             </Text>
           </Flex>
+
           <Flex
             as="button"
             align="center"
@@ -242,12 +188,7 @@ export default function PlannerPage() {
           gap="12px"
           mb="16px"
         >
-          <Box
-            px="12px"
-            py="3px"
-            borderRadius="12px"
-            bg="#FF4D4F"
-          >
+          <Box px="12px" py="3px" borderRadius="12px" bg="#FF4D4F">
             <Text fontSize="12px" fontWeight="700" color="white">
               Live
             </Text>
@@ -259,6 +200,7 @@ export default function PlannerPage() {
             Description of the live
           </Text>
         </Flex>
+
         <Flex
           h="38px"
           alignItems="center"
@@ -266,21 +208,86 @@ export default function PlannerPage() {
           mb="16px"
         >
           <Flex alignItems="center" gap="16px">
-            <Flex alignItems="baseline" gap="8px">
-              <Text fontSize="20px" fontWeight="700" color="#1A1A2E">
-                Mon 8
-              </Text>
-              <Text fontSize="16px" fontWeight="500" color="#3C4858">
+            <Flex alignItems="center" gap="12px">
+              <Flex
+                align="center"
+                gap="4px"
+                px="12px"
+                py="4px"
+                borderRadius="14px"
+                bg="#FFFFFF"
+                border="1px solid #D9E5F2"
+              >
+                <Text
+                  fontSize="13px"
+                  fontWeight="600"
+                  color="#8492A6"
+                  fontFamily="'Manrope', sans-serif"
+                >
+                  Mon
+                </Text>
+                <Text
+                  fontSize="13px"
+                  fontWeight="600"
+                  color="#242424"
+                  fontFamily="'Manrope', sans-serif"
+                >
+                  8
+                </Text>
+              </Flex>
+
+              <Text
+                fontSize="16px"
+                fontWeight="500"
+                color="#242424"
+                fontFamily="'Manrope', sans-serif"
+              >
                 Sept, 2025
               </Text>
             </Flex>
-            <Box cursor="pointer" _hover={{ opacity: 0.7 }}>
-              <Filter size={18} color="#8492A6" variant="Linear" />
-            </Box>
           </Flex>
 
           <Flex alignItems="center" gap="10px">
-            <Flex alignItems="center" gap="4px">
+            <Box
+              as="button"
+              w="32px"
+              h="32px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              borderRadius="6px"
+              border="1px solid #D9E5F2"
+              bg="white"
+              cursor="pointer"
+              _hover={{ bg: "#F7F9FC" }}
+            >
+              <People size={18} color="#8492A6" variant="Linear" />
+            </Box>
+
+            <Box
+              as="button"
+              w="32px"
+              h="32px"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              borderRadius="6px"
+              border="1px solid #D9E5F2"
+              bg="white"
+              cursor="pointer"
+              _hover={{ bg: "#F7F9FC" }}
+            >
+              <Filter size={18} color="#8492A6" variant="Linear" />
+            </Box>
+
+            <Flex
+              alignItems="center"
+              gap="0"
+              borderRadius="6px"
+              border="1px solid #D9E5F2"
+              bg="white"
+              overflow="hidden"
+            >
               <Box
                 as="button"
                 w="28px"
@@ -288,23 +295,18 @@ export default function PlannerPage() {
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
-                borderRadius="6px"
-                border="1px solid #D9E5F2"
-                bg="white"
                 cursor="pointer"
                 _hover={{ bg: "#F7F9FC" }}
+                borderRight="1px solid #D9E5F2"
               >
                 <ArrowLeft2 size={14} color="#3C4858" />
               </Box>
+
               <Flex
                 as="button"
                 align="center"
-                gap="4px"
                 px="12px"
                 py="5px"
-                borderRadius="6px"
-                border="1px solid #D9E5F2"
-                bg="white"
                 cursor="pointer"
                 _hover={{ bg: "#F7F9FC" }}
               >
@@ -312,6 +314,7 @@ export default function PlannerPage() {
                   Current day
                 </Text>
               </Flex>
+
               <Box
                 as="button"
                 w="28px"
@@ -319,53 +322,12 @@ export default function PlannerPage() {
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
-                borderRadius="6px"
-                border="1px solid #D9E5F2"
-                bg="white"
                 cursor="pointer"
                 _hover={{ bg: "#F7F9FC" }}
+                borderLeft="1px solid #D9E5F2"
               >
                 <ArrowRight2 size={14} color="#3C4858" />
               </Box>
-            </Flex>
-
-            <Box w="1px" h="20px" bg="#D9E5F2" />
-
-            <Flex
-              as="button"
-              align="center"
-              gap="4px"
-              px="12px"
-              py="5px"
-              borderRadius="6px"
-              border="1px solid #D9E5F2"
-              bg="white"
-              cursor="pointer"
-              _hover={{ bg: "#F7F9FC" }}
-            >
-              <Text fontSize="12px" fontWeight="500" color="#3C4858">
-                This day
-              </Text>
-              <LuChevronDown size={12} color="#8492A6" />
-            </Flex>
-
-            <Box w="1px" h="20px" bg="#D9E5F2" />
-
-            <Flex
-              as="button"
-              align="center"
-              gap="4px"
-              px="12px"
-              py="5px"
-              borderRadius="6px"
-              border="1px solid #4F46E5"
-              bg="#F0F0FF"
-              cursor="pointer"
-              _hover={{ bg: "#E8E7FF" }}
-            >
-              <Text fontSize="12px" fontWeight="600" color="#4F46E5">
-                Publish All
-              </Text>
             </Flex>
 
             <Flex
@@ -380,100 +342,144 @@ export default function PlannerPage() {
               cursor="pointer"
               _hover={{ bg: "#F7F9FC" }}
             >
+              <Box
+                w="8px"
+                h="8px"
+                borderRadius="50%"
+                bg="#10B981"
+                flexShrink={0}
+              />
+              <Text fontSize="12px" fontWeight="500" color="#3C4858">
+                This day
+              </Text>
+              <LuChevronDown size={12} color="#8492A6" />
+            </Flex>
+
+            <Flex
+              as="button"
+              align="center"
+              gap="4px"
+              px="12px"
+              py="5px"
+              borderRadius="6px"
+              border="1px solid #D9E5F2"
+              bg="white"
+              cursor="pointer"
+              _hover={{ bg: "#F7F9FC" }}
+            >
+              <Text fontSize="12px" fontWeight="600" color="#3C4858">
+                Publish All
+              </Text>
+            </Flex>
+
+            <Flex
+              as="button"
+              align="center"
+              gap="4px"
+              px="12px"
+              py="5px"
+              borderRadius="6px"
+              border="1px solid #D9E5F2"
+              bg="white"
+              cursor="pointer"
+              _hover={{ bg: "#F7F9FC" }}
+            >
               <Add size={14} color="#3C4858" />
               <Text fontSize="12px" fontWeight="500" color="#3C4858">
                 Lock Shift
               </Text>
-              <Lock size={14} color="#8492A6" variant="Linear" />
             </Flex>
           </Flex>
         </Flex>
 
-        {/* ── Calendar Grid ── */}
         <Box
+          maxW="1120px"
+          w="full"
           borderRadius="12px"
           border="1px solid #D9E5F2"
           bg="white"
           overflow="hidden"
         >
-          {/* Column Headers */}
-          <Flex borderBottom="1px solid #D9E5F2" bg="#FAFBFC">
-            {/* Time spacer */}
+          <Box maxH="884px" overflowY="auto">
             <Box
-              w="70px"
-              flexShrink={0}
-              borderRight="1px solid #D9E5F2"
-            />
-            {columns.map((col, i) => (
+              position="sticky"
+              top="0"
+              zIndex={20}
+              borderBottom="1px solid #D9E5F2"
+              bg="#FAFBFC"
+              display="grid"
+              gridTemplateColumns="80px repeat(4, 1fr)"
+            >
               <Box
-                key={col}
-                flex="1"
                 py="10px"
                 px="12px"
-                borderRight={i < columns.length - 1 ? "1px solid #D9E5F2" : "none"}
-                textAlign="center"
+                borderRight="1px solid #D9E5F2"
+                display="flex"
+                alignItems="center"
               >
-                <Text
-                  fontSize="12px"
-                  fontWeight="600"
-                  color="#3C4858"
-                  overflow="hidden"
-                  textOverflow="ellipsis"
-                  whiteSpace="nowrap"
-                >
-                  {col}
-                </Text>
-              </Box>
-            ))}
-          </Flex>
-
-          <Flex>
-            <Box w="70px" flexShrink={0} borderRight="1px solid #D9E5F2">
-              {timeSlots.map((time) => (
                 <Box
-                  key={time}
-                  h="80px"
-                  display="flex"
-                  alignItems="flex-start"
-                  justifyContent="flex-end"
-                  pr="12px"
-                  pt="4px"
-                  borderBottom="1px solid #F0F4F8"
+                  px="12px"
+                  py="3px"
+                  borderRadius="12px"
+                  bg="#E6F9F0"
+                  border="1px solid #B2EDCE"
                 >
-                  <Text fontSize="11px" fontWeight="500" color="#8492A6">
-                    {time}
+                  <Text fontSize="12px" fontWeight="600" color="#10B981">
+                    Days
+                  </Text>
+                </Box>
+              </Box>
+
+              {departments.map((dept, i) => (
+                <Box
+                  key={dept}
+                  py="10px"
+                  px="12px"
+                  borderRight={
+                    i < departments.length - 1 ? "1px solid #D9E5F2" : "none"
+                  }
+                  display="flex"
+                  alignItems="center"
+                >
+                  <Text
+                    fontSize="12px"
+                    fontWeight="600"
+                    color="#3C4858"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                    whiteSpace="nowrap"
+                  >
+                    {dept}
                   </Text>
                 </Box>
               ))}
             </Box>
 
-            {columns.map((col, colIndex) => (
-              <Box
-                key={col}
-                flex="1"
-                position="relative"
-                borderRight={colIndex < columns.length - 1 ? "1px solid #D9E5F2" : "none"}
-              >
-                {timeSlots.map((time, slotIdx) => (
-                  <Box
-                    key={time}
-                    h="80px"
-                    borderBottom={
-                      slotIdx < timeSlots.length - 1
-                        ? "1px solid #F0F4F8"
-                        : "none"
-                    }
-                  />
-                ))}
+            <Box display="grid" gridTemplateColumns="80px repeat(4, 1fr)">
+              <TimeColumn
+                gridStartMin={GRID_START_MIN}
+                totalSlots={TOTAL_SLOTS}
+                slotMinutes={SLOT_MINUTES}
+                slotHeight={SLOT_HEIGHT}
+              />
 
-                {appointments
-                  .filter((a) => a.column === colIndex)
-                  .map((appt) => (
-                    <AppointmentCard key={appt.id} appt={appt} />
-                  ))}
-              </Box>
-            ))}
-          </Flex>
+              {departments.map((dept, idx) => (
+                <DepartmentColumn
+                  key={dept}
+                  totalSlots={TOTAL_SLOTS}
+                  slotHeight={SLOT_HEIGHT}
+                  slotMinutes={SLOT_MINUTES}
+                  gridStartMin={GRID_START_MIN}
+                  gridEndMin={GRID_END_MIN}
+                  cards={scheduleData[idx] || []}
+                  seeAll={
+                    idx === 0 ? { slotIndex: 2, subColumn: "right" } : undefined
+                  }
+                  showBorderRight={idx < departments.length - 1}
+                />
+              ))}
+            </Box>
+          </Box>
         </Box>
       </Box>
     </Box>
