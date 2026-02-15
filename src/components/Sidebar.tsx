@@ -5,47 +5,38 @@ import { Box, Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Home,
-  Calendar1,
-  ClipboardText,
-  Folder2,
-  DocumentText,
-  Book,
-  Note,
-  Setting2,
-  HamburgerMenu,
-} from "iconsax-reactjs";
+import { HamburgerMenu } from "iconsax-reactjs";
 import { LuChevronDown, LuChevronRight } from "react-icons/lu";
 
 interface NavChild {
   label: string;
   href: string;
+  icon: string;
 }
 
 interface NavItem {
   label: string;
-  icon: React.ElementType;
+  icon: string;
   href?: string;
   children?: NavChild[];
 }
 
 const navItems: NavItem[] = [
-  { label: "Startpagina", icon: Home, href: "/" },
+  { label: "Startpagina", icon: "/assets/Startpagina.svg", href: "/" },
   {
     label: "Rooster",
-    icon: Calendar1,
+    icon: "/assets/Rooster.svg",
     children: [
-      { label: "Mijn Rooster", href: "/mijn-rooster" },
-      { label: "Planner", href: "/planner" },
-      { label: "Instellingen", href: "/instellingen" },
+      { label: "Mijn Rooster", href: "/mijn-rooster", icon: "/assets/Mijn.svg" },
+      { label: "Planner", href: "/planner", icon: "/assets/Planner.svg" },
+      { label: "Instellingen", href: "/instellingen", icon: "/assets/Planner.svg" },
     ],
   },
-  { label: "My to do Protocols", icon: ClipboardText, href: "/protocols" },
-  { label: "Document Management", icon: Folder2, href: "/documents" },
-  { label: "Department News", icon: DocumentText, href: "/department-news" },
-  { label: "Knowledge Base", icon: Book, href: "/knowledge-base" },
-  { label: "General News", icon: Note, href: "/general-news" },
+  { label: "My to do Protocols", icon: "/assets/Planner.svg", href: "/protocols" },
+  { label: "Document Management", icon: "/assets/document.svg", href: "/documents" },
+  { label: "Department News", icon: "/assets/department.svg", href: "/department-news" },
+  { label: "Knowledge Base", icon: "/assets/knowledge.svg", href: "/knowledge-base" },
+  { label: "General News", icon: "/assets/generalnews.svg", href: "/general-news" },
 ];
 
 export default function Sidebar() {
@@ -100,7 +91,6 @@ export default function Sidebar() {
 
       <Box flex="1" py="12px">
         {navItems.map((item) => {
-          const Icon = item.icon;
           const isExpanded = expandedItems.includes(item.label);
 
           if (item.children) {
@@ -116,12 +106,19 @@ export default function Sidebar() {
                   gap="12px"
                   transition="background 0.15s"
                 >
-                  <Icon size={20} color="#8492A6" variant="Linear" />
+                  <Image
+                    src={item.icon}
+                    alt={item.label}
+                    width={20}
+                    height={20}
+                  />
                   <Text
                     flex="1"
-                    fontSize="14px"
-                    color="#3C4858"
-                    fontWeight="500"
+                    fontFamily="'Manrope', sans-serif"
+                    fontSize="16px"
+                    color={isExpanded ? "#242424" : "#4E5D69"}
+                    fontWeight="700"
+                    lineHeight="100%"
                   >
                     {item.label}
                   </Text>
@@ -145,6 +142,7 @@ export default function Sidebar() {
                             align="center"
                             py="8px"
                             px="20px"
+                            gap="10px"
                             cursor="pointer"
                             borderRadius="6px"
                             bg={active ? "#F0F0FF" : "transparent"}
@@ -156,16 +154,24 @@ export default function Sidebar() {
                               <Box
                                 position="absolute"
                                 left="8px"
-                                w="4px"
-                                h="4px"
-                                borderRadius="50%"
+                                w="3px"
+                                h="18px"
+                                borderRadius="2px"
                                 bg="#4F46E5"
                               />
                             )}
+                            <Image
+                              src={child.icon}
+                              alt={child.label}
+                              width={20}
+                              height={20}
+                            />
                             <Text
-                              fontSize="14px"
-                              color={active ? "#4F46E5" : "#8492A6"}
-                              fontWeight={active ? "600" : "400"}
+                              fontFamily="'Manrope', sans-serif"
+                              fontSize="16px"
+                              color={active ? "#4F46E5" : "#4E5D69"}
+                              fontWeight="700"
+                              lineHeight="100%"
                             >
                               {child.label}
                             </Text>
@@ -197,15 +203,18 @@ export default function Sidebar() {
                 mb="2px"
                 transition="background 0.15s"
               >
-                <Icon
-                  size={20}
-                  color={active ? "#4F46E5" : "#8492A6"}
-                  variant="Linear"
+                <Image
+                  src={item.icon}
+                  alt={item.label}
+                  width={20}
+                  height={20}
                 />
                 <Text
-                  fontSize="14px"
-                  color={active ? "#4F46E5" : "#3C4858"}
-                  fontWeight={active ? "600" : "500"}
+                  fontFamily="'Manrope', sans-serif"
+                  fontSize="16px"
+                  color={active ? "#4F46E5" : "#4E5D69"}
+                  fontWeight="700"
+                  lineHeight="100%"
                 >
                   {item.label}
                 </Text>

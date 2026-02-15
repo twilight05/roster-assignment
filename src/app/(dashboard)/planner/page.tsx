@@ -168,7 +168,14 @@ export default function PlannerPage() {
         px="30px"
         bg="#FFFFFF"
       >
-        <Text fontSize="22px" fontWeight="700" color="#1A1A2E">
+        <Text
+          fontFamily="'Manrope', sans-serif"
+          fontSize="24px"
+          fontWeight="700"
+          lineHeight="100%"
+          letterSpacing="-0.02em"
+          color="#1A1A2E"
+        >
           Planner
         </Text>
         <Flex gap="12px" alignItems="center">
@@ -186,7 +193,13 @@ export default function PlannerPage() {
             transition="background 0.15s"
           >
             <LuChevronDown size={14} color="#3C4858" />
-            <Text fontSize="13px" fontWeight="500" color="#3C4858">
+            <Text
+              fontFamily="'Manrope', sans-serif"
+              fontSize="14px"
+              fontWeight="600"
+              lineHeight="100%"
+              color="#3C4858"
+            >
               Open Days
             </Text>
           </Flex>
@@ -197,16 +210,23 @@ export default function PlannerPage() {
             px="16px"
             py="8px"
             borderRadius="8px"
-            bg="#4F46E5"
+            border="1px solid #D9E5F2"
+            bg="white"
             cursor="pointer"
-            _hover={{ bg: "#4338CA" }}
+            _hover={{ bg: "#F7F9FC" }}
             transition="background 0.15s"
           >
-            <Add size={16} color="white" />
-            <Text fontSize="13px" fontWeight="500" color="white">
+            <Add size={16} color="#3C4858" />
+            <Text
+              fontFamily="'Manrope', sans-serif"
+              fontSize="14px"
+              fontWeight="600"
+              lineHeight="100%"
+              color="#3C4858"
+            >
               Nieuw
             </Text>
-            <LuChevronDown size={14} color="white" />
+            <LuChevronDown size={14} color="#3C4858" />
           </Flex>
         </Flex>
       </Flex>
