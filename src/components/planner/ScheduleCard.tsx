@@ -27,12 +27,14 @@ export default function ScheduleCard({
   return (
     <Box
       bg={bgColor}
-      border={`1px solid ${borderColor}`}
-      borderLeft={`3px solid ${borderColor}`}
-      borderRadius="sm"
+      border="1px solid"
+      borderColor={borderColor}
+      borderLeft="3px solid"
+      borderLeftColor={borderColor}
+      borderRadius="md"
       pt="10px"
       pb="10px"
-      px="8px"
+      px="10px"
       overflow="hidden"
       cursor="pointer"
       transition="box-shadow 0.15s"

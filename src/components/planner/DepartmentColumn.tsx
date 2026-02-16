@@ -2,6 +2,7 @@
 
 import { Box, Text } from "@chakra-ui/react";
 import ScheduleCard from "./ScheduleCard";
+import { displayTime } from "@/data/planner";
 
 export interface CardData {
   id: string;
@@ -13,12 +14,68 @@ export interface CardData {
   tagColor: string;
   bgColor: string;
   borderColor: string;
-  subColumn?: "left" | "right";
 }
 
 export interface SeeAllIndicator {
   slotIndex: number;
-  subColumn?: "left" | "right";
+  laneIndex?: number;
+  laneCount?: number;
+}
+
+interface LanedCard extends CardData {
+  laneIndex: number;
+  laneCount: number;
+}
+
+/** Assign each card a lane index based on time overlaps */
+function assignLanes(cards: CardData[]): LanedCard[] {
+  const sorted = [...cards].sort((a, b) => a.startMin - b.startMin);
+
+  // Greedy lane assignment — place into first available lane
+  const laneEnds: number[] = [];
+  const placed = sorted.map((card) => {
+    let lane = laneEnds.findIndex((end) => card.startMin >= end);
+    if (lane === -1) {
+      lane = laneEnds.length;
+      laneEnds.push(card.endMin);
+    } else {
+      laneEnds[lane] = card.endMin;
+    }
+    return { card, lane };
+  });
+
+  // Sweep-based overlap grouping (handles transitive overlaps: A↔B↔C)
+  const withIdx = placed.map((p, idx) => ({ ...p, idx }));
+  withIdx.sort((a, b) => a.card.startMin - b.card.startMin);
+
+  const groups: number[][] = [];
+  let active: number[] = [];
+  let groupEnd = -Infinity;
+
+  for (const item of withIdx) {
+    if (active.length > 0 && item.card.startMin >= groupEnd) {
+      groups.push(active);
+      active = [];
+      groupEnd = -Infinity;
+    }
+    active.push(item.idx);
+    groupEnd = Math.max(groupEnd, item.card.endMin);
+  }
+  if (active.length) groups.push(active);
+
+  // laneCount per group = distinct lanes used across the whole overlap group
+  const laneCountByIdx = new Map<number, number>();
+  for (const group of groups) {
+    const distinctLanes = new Set(group.map((i) => placed[i].lane));
+    const count = distinctLanes.size || 1;
+    for (const i of group) laneCountByIdx.set(i, count);
+  }
+
+  return placed.map((p, idx) => ({
+    ...p.card,
+    laneIndex: p.lane,
+    laneCount: laneCountByIdx.get(idx) ?? 1,
+  }));
 }
 
 interface DepartmentColumnProps {
@@ -31,6 +88,9 @@ interface DepartmentColumnProps {
   seeAll?: SeeAllIndicator;
   showBorderRight?: boolean;
 }
+
+const CARD_GAP = 6;
+const CARD_PAD = 8;
 
 export default function DepartmentColumn({
   totalSlots,
@@ -45,8 +105,17 @@ export default function DepartmentColumn({
   const pxPerMinute = slotHeight / slotMinutes;
   const totalHeight = totalSlots * slotHeight;
 
-  const seeAllLeft = seeAll?.subColumn === "right" ? "calc(50% + 4px)" : "8px";
-  const seeAllRight = seeAll?.subColumn === "left" ? "calc(50% + 4px)" : "8px";
+  const visible = cards.filter(
+    (c) => c.startMin < gridEndMin && c.endMin > gridStartMin,
+  );
+  const laned = assignLanes(visible);
+
+  const showSeeAll =
+    seeAll && seeAll.slotIndex >= 0 && seeAll.slotIndex < totalSlots;
+  const seeAllLaneIdx = seeAll?.laneIndex ?? 0;
+  const seeAllLanes = seeAll?.laneCount ?? 1;
+  const seeAllLeft = `calc(${CARD_PAD}px + ${seeAllLaneIdx} * (100% - ${2 * CARD_PAD}px) / ${seeAllLanes})`;
+  const seeAllWidth = `calc((100% - ${2 * CARD_PAD}px) / ${seeAllLanes} - ${CARD_GAP}px)`;
 
   return (
     <Box
@@ -70,57 +139,48 @@ export default function DepartmentColumn({
         />
       ))}
 
-      {cards
-        .filter((c) => c.startMin < gridEndMin && c.endMin > gridStartMin)
-        .map((card) => {
-          const clampedStart = Math.max(card.startMin, gridStartMin);
-          const clampedEnd = Math.min(card.endMin, gridEndMin);
+      {laned.map((card) => {
+        const clampedStart = Math.max(card.startMin, gridStartMin);
+        const clampedEnd = Math.min(card.endMin, gridEndMin);
 
-          const top = (clampedStart - gridStartMin) * pxPerMinute;
-          const rawHeight = (clampedEnd - clampedStart) * pxPerMinute;
-          const cardHeight = Math.max(rawHeight - 4, 28);
+        const top = (clampedStart - gridStartMin) * pxPerMinute;
+        const rawHeight = (clampedEnd - clampedStart) * pxPerMinute;
+        const cardHeight = Math.max(rawHeight - 4, 28);
 
-          let left = "8px";
-          let right = "8px";
+        const left = `calc(${CARD_PAD}px + ${card.laneIndex} * (100% - ${2 * CARD_PAD}px) / ${card.laneCount})`;
+        const width =
+          card.laneCount === 1
+            ? `calc(100% - ${2 * CARD_PAD}px)`
+            : `calc((100% - ${2 * CARD_PAD}px) / ${card.laneCount} - ${CARD_GAP}px)`;
 
-          if (card.subColumn === "left") {
-            right = "calc(50% + 4px)";
-          } else if (card.subColumn === "right") {
-            left = "calc(50% + 4px)";
-          }
+        return (
+          <ScheduleCard
+            key={card.id}
+            title={card.title}
+            timeLabel={`${displayTime(card.startMin)} - ${displayTime(
+              card.endMin,
+            )}`}
+            staff={card.staff}
+            tag={card.tag}
+            tagColor={card.tagColor}
+            bgColor={card.bgColor}
+            borderColor={card.borderColor}
+            style={{
+              position: "absolute",
+              top: `${top}px`,
+              left,
+              width,
+              height: `${cardHeight}px`,
+              zIndex: 2,
+            }}
+          />
+        );
+      })}
 
-          return (
-            <ScheduleCard
-              key={card.id}
-              title={card.title}
-              timeLabel={`${formatTime(card.startMin)} - ${formatTime(
-                card.endMin,
-              )}`}
-              staff={card.staff}
-              tag={card.tag}
-              tagColor={card.tagColor}
-              bgColor={card.bgColor}
-              borderColor={card.borderColor}
-              style={{
-                position: "absolute",
-                top: `${top}px`,
-                left,
-                right,
-                height: `${cardHeight}px`,
-                zIndex: 2,
-              }}
-            />
-          );
-        })}
-
-      {seeAll && seeAll.slotIndex >= 0 && seeAll.slotIndex < totalSlots && (
+      {showSeeAll && (
         <Box
           position="absolute"
-          top={`${seeAll.slotIndex * slotHeight + (slotHeight - 64) / 2}px`}
-          left={seeAllLeft}
-          right={seeAllRight}
           maxW="110px"
-          mx="auto"
           h="64px"
           display="flex"
           alignItems="center"
@@ -130,8 +190,13 @@ export default function DepartmentColumn({
           borderColor="borderDefault"
           borderRadius="sm"
           cursor="pointer"
-          zIndex={1}
+          zIndex={2}
           _hover={{ bg: "surfaceSoftHover" }}
+          style={{
+            top: `${seeAll!.slotIndex * slotHeight + (slotHeight - 64) / 2}px`,
+            left: `calc(${CARD_PAD}px + ${seeAllLaneIdx} * (100% - ${2 * CARD_PAD}px) / ${seeAllLanes})`,
+            width: `calc((100% - ${2 * CARD_PAD}px) / ${seeAllLanes} - ${CARD_GAP}px)`,
+          }}
         >
           <Text fontSize="xs" fontWeight="600" color="textSecondary">
             See all
@@ -140,10 +205,4 @@ export default function DepartmentColumn({
       )}
     </Box>
   );
-}
-
-function formatTime(totalMinutes: number): string {
-  const h = Math.floor(totalMinutes / 60) % 24;
-  const m = totalMinutes % 60;
-  return `${h}:${m.toString().padStart(2, "0")}`;
 }

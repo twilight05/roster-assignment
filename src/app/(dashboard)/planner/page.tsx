@@ -1,11 +1,15 @@
 "use client";
 
+import { useState, useMemo, useCallback } from "react";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { Filter, Add, ArrowLeft2, ArrowRight2, People } from "iconsax-reactjs";
 import { LuChevronDown } from "react-icons/lu";
 import TimeColumn from "@/components/planner/TimeColumn";
 import DepartmentColumn from "@/components/planner/DepartmentColumn";
-import { departments, scheduleData } from "@/data/planner";
+import { departments, shifts } from "@/data/planner";
+import { shiftToCard } from "@/lib/shiftHelpers";
+
+type ViewMode = "live" | "planner";
 
 const SLOT_MINUTES = 30;
 const SLOT_HEIGHT = 120;
@@ -14,7 +18,82 @@ const GRID_START_MIN = 11 * 60;
 const GRID_END_MIN = 16 * 60;
 const TOTAL_SLOTS = Math.floor((GRID_END_MIN - GRID_START_MIN) / SLOT_MINUTES);
 
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
+
+function addDays(date: Date, offset: number): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + offset);
+  return next;
+}
+
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
 export default function PlannerPage() {
+  const [viewMode, setViewMode] = useState<ViewMode>("planner");
+  const [selectedDay, setSelectedDay] = useState(() => new Date(2025, 8, 8));
+  const [isLoading, setIsLoading] = useState(false);
+
+  const isToday = useMemo(
+    () => isSameDay(selectedDay, new Date()),
+    [selectedDay],
+  );
+
+  const dayLabel = useMemo(() => {
+    const wd = WEEKDAYS[selectedDay.getDay()];
+    const d = selectedDay.getDate();
+    const mo = MONTHS[selectedDay.getMonth()];
+    const yr = selectedDay.getFullYear();
+    return { weekday: wd, date: d, monthYear: `${mo}, ${yr}` };
+  }, [selectedDay]);
+
+  const navigateDay = useCallback((offset: number) => {
+    setIsLoading(true);
+    setSelectedDay((prev) => addDays(prev, offset));
+    // simulate async load
+    setTimeout(() => setIsLoading(false), 300);
+  }, []);
+
+  const goToToday = useCallback(() => {
+    const now = new Date();
+    setIsLoading(true);
+    setSelectedDay(now);
+    setTimeout(() => setIsLoading(false), 300);
+  }, []);
+
+  const toggleViewMode = useCallback(() => {
+    setViewMode((prev) => (prev === "live" ? "planner" : "live"));
+  }, []);
+
+  /** Keep only shifts whose ISO start date matches selectedDay */
+  const visibleShifts = useMemo(() => {
+    const yy = selectedDay.getFullYear();
+    const mm = String(selectedDay.getMonth() + 1).padStart(2, "0");
+    const dd = String(selectedDay.getDate()).padStart(2, "0");
+    const datePrefix = `${yy}-${mm}-${dd}`;
+
+    return shifts.filter((s) => s.start.startsWith(datePrefix));
+  }, [selectedDay]);
+
   return (
     <Box>
       <Flex
@@ -52,7 +131,7 @@ export default function PlannerPage() {
             _hover={{ bg: "surface" }}
             transition="background 0.15s"
           >
-            <LuChevronDown size={14} color="var(--colors-text-secondary)" />
+            <LuChevronDown size={14} color="#3C4858" />
             <Text
               fontFamily="body"
               fontSize="md"
@@ -78,7 +157,7 @@ export default function PlannerPage() {
             _hover={{ bg: "surface" }}
             transition="background 0.15s"
           >
-            <Add size={16} color="var(--colors-text-secondary)" />
+            <Add size={16} color="#3C4858" />
             <Text
               fontFamily="body"
               fontSize="md"
@@ -88,7 +167,7 @@ export default function PlannerPage() {
             >
               Nieuw
             </Text>
-            <LuChevronDown size={14} color="var(--colors-text-secondary)" />
+            <LuChevronDown size={14} color="#3C4858" />
           </Flex>
         </Flex>
       </Flex>
@@ -110,7 +189,13 @@ export default function PlannerPage() {
               Live
             </Text>
           </Box>
-          <Text fontSize="13px" fontWeight="600" color="textSecondary">
+          <Text
+            fontSize="13px"
+            fontWeight="600"
+            color={viewMode === "planner" ? "textSecondary" : "textMuted"}
+            cursor="pointer"
+            onClick={() => setViewMode("planner")}
+          >
             Planner
           </Text>
           <Text fontSize="13px" color="textMuted">
@@ -142,7 +227,7 @@ export default function PlannerPage() {
                   color="textMuted"
                   fontFamily="body"
                 >
-                  Mon
+                  {dayLabel.weekday}
                 </Text>
                 <Text
                   fontSize="13px"
@@ -150,7 +235,7 @@ export default function PlannerPage() {
                   color="textPrimary"
                   fontFamily="body"
                 >
-                  8
+                  {dayLabel.date}
                 </Text>
               </Flex>
 
@@ -160,7 +245,7 @@ export default function PlannerPage() {
                 color="textPrimary"
                 fontFamily="body"
               >
-                Sept, 2025
+                {dayLabel.monthYear}
               </Text>
             </Flex>
           </Flex>
@@ -180,11 +265,7 @@ export default function PlannerPage() {
               cursor="pointer"
               _hover={{ bg: "surface" }}
             >
-              <People
-                size={18}
-                color="var(--colors-text-muted)"
-                variant="Linear"
-              />
+              <People size={18} color="#8492A6" variant="Linear" />
             </Box>
 
             <Box
@@ -201,11 +282,7 @@ export default function PlannerPage() {
               cursor="pointer"
               _hover={{ bg: "surface" }}
             >
-              <Filter
-                size={18}
-                color="var(--colors-text-muted)"
-                variant="Linear"
-              />
+              <Filter size={18} color="#8492A6" variant="Linear" />
             </Box>
 
             <Flex
@@ -228,8 +305,9 @@ export default function PlannerPage() {
                 _hover={{ bg: "surface" }}
                 borderRight="1px solid"
                 borderColor="borderDefault"
+                onClick={() => navigateDay(-1)}
               >
-                <ArrowLeft2 size={14} color="var(--colors-text-secondary)" />
+                <ArrowLeft2 size={14} color="#3C4858" />
               </Box>
 
               <Flex
@@ -239,6 +317,7 @@ export default function PlannerPage() {
                 py="5px"
                 cursor="pointer"
                 _hover={{ bg: "surface" }}
+                onClick={goToToday}
               >
                 <Text fontSize="sm" fontWeight="500" color="textSecondary">
                   Current day
@@ -256,8 +335,9 @@ export default function PlannerPage() {
                 _hover={{ bg: "surface" }}
                 borderLeft="1px solid"
                 borderColor="borderDefault"
+                onClick={() => navigateDay(1)}
               >
-                <ArrowRight2 size={14} color="var(--colors-text-secondary)" />
+                <ArrowRight2 size={14} color="#3C4858" />
               </Box>
             </Flex>
 
@@ -273,18 +353,19 @@ export default function PlannerPage() {
               bg="white"
               cursor="pointer"
               _hover={{ bg: "surface" }}
+              onClick={goToToday}
             >
               <Box
                 w="8px"
                 h="8px"
                 borderRadius="50%"
-                bg="greenDot"
+                bg={isToday ? "greenDot" : "textMuted"}
                 flexShrink={0}
               />
               <Text fontSize="sm" fontWeight="500" color="textSecondary">
                 This day
               </Text>
-              <LuChevronDown size={12} color="var(--colors-text-muted)" />
+              <LuChevronDown size={12} color="#8492A6" />
             </Flex>
 
             <Flex
@@ -318,7 +399,7 @@ export default function PlannerPage() {
               cursor="pointer"
               _hover={{ bg: "surface" }}
             >
-              <Add size={14} color="var(--colors-text-secondary)" />
+              <Add size={14} color="#3C4858" />
               <Text fontSize="sm" fontWeight="500" color="textSecondary">
                 Lock Shift
               </Text>
@@ -335,7 +416,12 @@ export default function PlannerPage() {
           bg="white"
           overflow="hidden"
         >
-          <Box maxH="884px" overflowY="auto">
+          <Box
+            maxH="884px"
+            overflowY="auto"
+            opacity={isLoading ? 0.5 : 1}
+            transition="opacity 0.2s"
+          >
             <Box
               position="sticky"
               top="0"
@@ -370,7 +456,7 @@ export default function PlannerPage() {
 
               {departments.map((dept, i) => (
                 <Box
-                  key={dept}
+                  key={dept.id}
                   py="10px"
                   px="12px"
                   borderRight={
@@ -388,7 +474,7 @@ export default function PlannerPage() {
                     textOverflow="ellipsis"
                     whiteSpace="nowrap"
                   >
-                    {dept}
+                    {dept.name}
                   </Text>
                 </Box>
               ))}
@@ -404,15 +490,19 @@ export default function PlannerPage() {
 
               {departments.map((dept, idx) => (
                 <DepartmentColumn
-                  key={dept}
+                  key={dept.id}
                   totalSlots={TOTAL_SLOTS}
                   slotHeight={SLOT_HEIGHT}
                   slotMinutes={SLOT_MINUTES}
                   gridStartMin={GRID_START_MIN}
                   gridEndMin={GRID_END_MIN}
-                  cards={scheduleData[idx] || []}
+                  cards={visibleShifts
+                    .filter((s) => s.departmentId === dept.id)
+                    .map(shiftToCard)}
                   seeAll={
-                    idx === 0 ? { slotIndex: 2, subColumn: "right" } : undefined
+                    idx === 0
+                      ? { slotIndex: 2, laneIndex: 2, laneCount: 3 }
+                      : undefined
                   }
                   showBorderRight={idx < departments.length - 1}
                 />
