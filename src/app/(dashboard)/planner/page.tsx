@@ -95,7 +95,17 @@ export default function PlannerPage() {
     return shifts.filter((s) => s.start.startsWith(datePrefix));
   }, [selectedDay]);
 
-  const handleCardClick = useCallback((_cardId: string) => {}, []);
+  const handleCardClick = useCallback(
+    (cardId: string) => {
+      const shift = visibleShifts.find((s) => s.id === cardId);
+      if (!shift) return;
+      const h = Number(shift.start.slice(11, 13));
+      const m = Number(shift.start.slice(14, 16));
+      setPanelScrollMin(h * 60 + m);
+      setPanelOpen(true);
+    },
+    [visibleShifts],
+  );
 
   const handleSeeAllClick = useCallback((slotIndex: number) => {
     const slotStartMin = GRID_START_MIN + slotIndex * SLOT_MINUTES;

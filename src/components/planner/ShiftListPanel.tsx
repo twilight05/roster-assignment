@@ -142,43 +142,56 @@ export default function ShiftListPanel({
                     bg={tokens.bg}
                     border="1px solid"
                     borderColor={tokens.border}
-                    borderLeft="3px solid"
-                    borderLeftColor={tokens.border}
                     borderRadius="md"
                     px="12px"
                     py="10px"
                   >
-                    <Flex align="center" gap="8px" mb="4px">
-                      <Box
-                        px="6px"
-                        py="2px"
-                        borderRadius="4px"
-                        bg={tokens.tag}
+                    <Flex align="flex-start" gap="8px">
+                      <Flex
+                        w="28px"
+                        h="28px"
+                        borderRadius="50%"
+                        bg="white"
+                        align="center"
+                        justify="center"
                         flexShrink={0}
+                        mt="2px"
+                        style={{
+                          border: `1.5px solid var(--colors-${tokens.border})`,
+                        }}
                       >
-                        <Text fontSize="10px" fontWeight="700" color="white">
+                        <Text
+                          fontSize="10px"
+                          fontWeight="700"
+                          color="textMuted"
+                        >
                           {shift.tag}
                         </Text>
+                      </Flex>
+                      <Box flex="1" minW="0">
+                        <Text
+                          fontSize="sm"
+                          fontWeight="600"
+                          color="textPrimary"
+                          lineHeight="1.3"
+                        >
+                          {shift.title}{" "}
+                          <Text
+                            as="span"
+                            fontSize="xs"
+                            fontWeight="400"
+                            color="textMuted"
+                          >
+                            {displayTime(startMin)} - {displayTime(endMin)}
+                          </Text>
+                        </Text>
+                        {shift.staffName && (
+                          <Text fontSize="xs" color={tokens.border} mt="2px">
+                            {shift.staffName}
+                          </Text>
+                        )}
                       </Box>
-                      <Text
-                        fontSize="sm"
-                        fontWeight="600"
-                        color="textPrimary"
-                        lineHeight="1.3"
-                      >
-                        {shift.title}
-                      </Text>
                     </Flex>
-
-                    <Text fontSize="xs" color="textMuted">
-                      {displayTime(startMin)} - {displayTime(endMin)}
-                    </Text>
-
-                    {shift.staffName && (
-                      <Text fontSize="xs" color="staffLink" mt="2px">
-                        {shift.staffName}
-                      </Text>
-                    )}
                   </Box>
                 );
               })}
