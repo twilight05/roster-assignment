@@ -22,7 +22,12 @@ export default function TimeColumn({
   slotHeight,
 }: TimeColumnProps) {
   return (
-    <Box w="80px" flexShrink={0} borderRight="1px solid #D9E5F2">
+    <Box
+      w="80px"
+      flexShrink={0}
+      borderRight="1px solid"
+      borderColor="borderDefault"
+    >
       {Array.from({ length: totalSlots }).map((_, i) => {
         const mins = gridStartMin + i * slotMinutes;
         const label = formatTime(mins);
@@ -37,12 +42,13 @@ export default function TimeColumn({
             justifyContent="flex-end"
             pr="12px"
             pt="4px"
-            borderBottom={i < totalSlots - 1 ? "1px solid #F0F4F8" : "none"}
+            borderBottom={i < totalSlots - 1 ? "1px solid" : "none"}
+            borderColor="borderSoft"
           >
             <Text
-              fontSize="11px"
+              fontSize="xs"
               fontWeight={isFullHour ? "600" : "500"}
-              color={isFullHour ? "#3C4858" : "#8492A6"}
+              color={isFullHour ? "textSecondary" : "textMuted"}
             >
               {label}
             </Text>

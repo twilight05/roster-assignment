@@ -29,14 +29,14 @@ export default function ScheduleCard({
       bg={bgColor}
       border={`1px solid ${borderColor}`}
       borderLeft={`3px solid ${borderColor}`}
-      borderRadius="8px"
+      borderRadius="sm"
       pt="10px"
       pb="10px"
       px="8px"
       overflow="hidden"
       cursor="pointer"
       transition="box-shadow 0.15s"
-      _hover={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
+      _hover={{ boxShadow: "0 2px 8px var(--colors-card-hover-shadow)" }}
       zIndex={2}
       minH="24px"
       style={style}
@@ -49,16 +49,16 @@ export default function ScheduleCard({
         </Box>
       </Flex>
 
-      <Text fontSize="12px" fontWeight="600" color="#1A1A2E" lineHeight="1.3">
+      <Text fontSize="sm" fontWeight="600" color="textPrimary" lineHeight="1.3">
         {title}
       </Text>
 
-      <Text fontSize="11px" color="#8492A6" mt="2px">
+      <Text fontSize="xs" color="textMuted" mt="2px">
         {timeLabel}
       </Text>
 
       {staff && (
-        <Text fontSize="11px" color="#3D7EFF" mt="2px">
+        <Text fontSize="xs" color="staffLink" mt="2px">
           {staff}
         </Text>
       )}

@@ -10,7 +10,7 @@ export default function DashboardLayout({
   return (
     <Flex minH="100vh">
       <Sidebar />
-      <Flex direction="column" flex="1" ml="260px" bg="#FAFBFC">
+      <Flex direction="column" flex="1" ml="260px" bg="surface">
         <Navbar />
         <Box flex="1">{children}</Box>
       </Flex>

@@ -52,7 +52,8 @@ export default function DepartmentColumn({
     <Box
       position="relative"
       h={`${totalHeight}px`}
-      borderRight={showBorderRight ? "1px solid #D9E5F2" : "none"}
+      borderRight={showBorderRight ? "1px solid" : "none"}
+      borderColor="borderDefault"
       overflow="hidden"
     >
       {Array.from({ length: totalSlots }).map((_, i) => (
@@ -63,7 +64,8 @@ export default function DepartmentColumn({
           left="0"
           right="0"
           h={`${slotHeight}px`}
-          borderBottom={i < totalSlots - 1 ? "1px solid #F0F4F8" : "none"}
+          borderBottom={i < totalSlots - 1 ? "1px solid" : "none"}
+          borderColor="borderSoft"
           pointerEvents="none"
         />
       ))}
@@ -123,14 +125,15 @@ export default function DepartmentColumn({
           display="flex"
           alignItems="center"
           justifyContent="center"
-          bg="#EEF2F6"
-          border="1px solid #D9E5F2"
-          borderRadius="8px"
+          bg="surfaceSoft"
+          border="1px solid"
+          borderColor="borderDefault"
+          borderRadius="sm"
           cursor="pointer"
           zIndex={1}
-          _hover={{ bg: "#E7EEF6" }}
+          _hover={{ bg: "surfaceSoftHover" }}
         >
-          <Text fontSize="11px" fontWeight="600" color="#3C4858">
+          <Text fontSize="xs" fontWeight="600" color="textSecondary">
             See all
           </Text>
         </Box>
