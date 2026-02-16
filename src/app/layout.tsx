@@ -18,6 +18,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/assets/faviconlogo.svg" type="image/svg+xml" />
+      </head>
       <body className={manrope.variable}>
         <Providers>{children}</Providers>
       </body>

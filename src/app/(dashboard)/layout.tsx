@@ -18,7 +18,7 @@ export default function DashboardLayout({
         bg="surface"
       >
         <Navbar />
-        <Box flex="1" overflowX="hidden">
+        <Box flex="1" overflowX="auto">
           {children}
         </Box>
       </Flex>

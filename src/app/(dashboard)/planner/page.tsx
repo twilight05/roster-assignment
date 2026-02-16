@@ -85,6 +85,7 @@ export default function PlannerPage() {
   // Side panel state
   const [panelOpen, setPanelOpen] = useState(false);
   const [panelScrollMin, setPanelScrollMin] = useState<number | undefined>();
+  const [dayDropdownOpen, setDayDropdownOpen] = useState(false);
 
   const visibleShifts = useMemo(() => {
     const yy = selectedDay.getFullYear();
@@ -267,10 +268,13 @@ export default function PlannerPage() {
           {/* Right: toolbar + grid */}
           <Box flex="1" minW="0">
             <Flex
-              h="38px"
+              minH="38px"
               alignItems="center"
               justifyContent="space-between"
               mb="16px"
+              flexShrink={0}
+              position="relative"
+              zIndex={25}
             >
               <Flex alignItems="center" gap="16px">
                 <Flex alignItems="center" gap="12px">
@@ -405,32 +409,75 @@ export default function PlannerPage() {
                   </Box>
                 </Flex>
 
-                <Flex
-                  as="button"
-                  align="center"
-                  gap="6px"
-                  px="12px"
-                  py="5px"
-                  borderRadius="xs"
-                  border="1px solid"
-                  borderColor="borderDefault"
-                  bg="white"
-                  cursor="pointer"
-                  _hover={{ bg: "surface" }}
-                  onClick={goToToday}
-                >
-                  <Box
-                    w="8px"
-                    h="8px"
-                    borderRadius="50%"
-                    bg={isToday ? "greenDot" : "textMuted"}
-                    flexShrink={0}
-                  />
-                  <Text fontSize="sm" fontWeight="500" color="textSecondary">
-                    This day
-                  </Text>
-                  <LuChevronDown size={12} color="#8492A6" />
-                </Flex>
+                <Box position="relative">
+                  <Flex
+                    as="button"
+                    align="center"
+                    gap="6px"
+                    px="12px"
+                    py="5px"
+                    borderRadius="xs"
+                    border="1px solid"
+                    borderColor="borderDefault"
+                    bg="white"
+                    cursor="pointer"
+                    _hover={{ bg: "surface" }}
+                    onClick={() => setDayDropdownOpen((v) => !v)}
+                  >
+                    <Box
+                      w="8px"
+                      h="8px"
+                      borderRadius="50%"
+                      bg={isToday ? "greenDot" : "textMuted"}
+                      flexShrink={0}
+                    />
+                    <Text fontSize="sm" fontWeight="500" color="textSecondary">
+                      This day
+                    </Text>
+                    <LuChevronDown size={12} color="#8492A6" />
+                  </Flex>
+
+                  {dayDropdownOpen && (
+                    <Box
+                      position="absolute"
+                      top="calc(100% + 4px)"
+                      left="0"
+                      bg="white"
+                      border="1px solid"
+                      borderColor="borderDefault"
+                      borderRadius="8px"
+                      boxShadow="0 4px 12px rgba(0,0,0,0.08)"
+                      py="4px"
+                      minW="140px"
+                      zIndex={20}
+                    >
+                      {["Deze dag", "Deze week", "Maand", "Custom +"].map(
+                        (item) => (
+                          <Box
+                            key={item}
+                            as="button"
+                            display="block"
+                            w="100%"
+                            textAlign="left"
+                            px="12px"
+                            py="8px"
+                            fontSize="sm"
+                            fontWeight="500"
+                            color="textSecondary"
+                            cursor="pointer"
+                            _hover={{ bg: "surface" }}
+                            onClick={() => {
+                              setDayDropdownOpen(false);
+                              if (item === "Deze dag") goToToday();
+                            }}
+                          >
+                            {item}
+                          </Box>
+                        ),
+                      )}
+                    </Box>
+                  )}
+                </Box>
 
                 <Flex
                   as="button"

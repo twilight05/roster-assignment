@@ -26,13 +26,13 @@ export const navItems: NavItem[] = [
       {
         label: "Instellingen",
         href: "/instellingen",
-        icon: "/assets/Planner.svg",
+        icon: "/assets/stickynote.svg",
       },
     ],
   },
   {
     label: "My to do Protocols",
-    icon: "/assets/Planner.svg",
+    icon: "/assets/stickynote.svg",
     href: "/protocols",
   },
   {

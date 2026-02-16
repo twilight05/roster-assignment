@@ -2,29 +2,25 @@
 
 import { useState, useMemo } from "react";
 import { Box, Flex, Text } from "@chakra-ui/react";
-import { SearchNormal1, FilterSearch, ExportSquare } from "iconsax-reactjs";
-import type { RosterPerson, RosterTab, DayDotColor } from "@/types/planner";
+import Image from "next/image";
+import { SearchNormal1, FilterSearch } from "iconsax-reactjs";
+import type { RosterPerson, RosterTab } from "@/types/planner";
 
 interface RosterSidebarProps {
   people: RosterPerson[];
   onClose?: () => void;
 }
 
-const DAY_COLOR_HEX: Record<DayDotColor, string> = {
-  red: "#EF4444",
-  green: "#10B981",
-  orange: "#F59E0B",
-  blue: "#3B82F6",
-  gray: "#D1D5DB",
+const WEEKDAY_STYLE: Record<string, { bg: string; color: string }> = {
+  m: { bg: "#EBFFEF", color: "#37A55C" },
+  di: { bg: "#EBFFEF", color: "#37A55C" },
+  w: { bg: "#EBFFEF", color: "#37A55C" },
+  do: { bg: "#FFEFE7", color: "#F55300" },
+  vr: { bg: "#FFEFE7", color: "#F55300" },
 };
 
-const DAY_BG_HEX: Record<DayDotColor, string> = {
-  red: "#FEF2F2",
-  green: "#F1FBF4",
-  orange: "#FFFBEB",
-  blue: "#EFF6FF",
-  gray: "#F9FAFB",
-};
+const ON_LEAVE_BG = "#FEECEC";
+const ON_LEAVE_COLOR = "#EF2E2E";
 
 export default function RosterSidebar({ people, onClose }: RosterSidebarProps) {
   const [activeTab, setActiveTab] = useState<RosterTab>("on-leave");
@@ -62,20 +58,20 @@ export default function RosterSidebar({ people, onClose }: RosterSidebarProps) {
 
   return (
     <Box
-      w="280px"
-      minW="280px"
+      w="310px"
+      minW="310px"
       bg="white"
-      borderRadius="md"
-      border="1px solid"
+      borderRadius="16px"
+      border="2px solid"
       borderColor="borderDefault"
       overflow="hidden"
       alignSelf="stretch"
     >
       <Flex
-        px="16px"
+        px="24px"
         py="14px"
         alignItems="center"
-        gap="8px"
+        gap="20px"
         borderBottom="1px solid"
         borderColor="borderDefault"
       >
@@ -88,15 +84,20 @@ export default function RosterSidebar({ people, onClose }: RosterSidebarProps) {
           flexShrink={0}
           onClick={onClose}
         >
-          <ExportSquare size={18} color="#3C4858" />
+          <Image src="/assets/Icon.svg" alt="expand" width={16} height={16} />
         </Box>
         <Box w="1px" h="18px" bg="borderDefault" />
-        <Text fontSize="md" fontWeight="700" color="textPrimary">
+        <Text
+          fontSize="md"
+          fontWeight="700"
+          fontFamily="body"
+          color="textPrimary"
+        >
           Roster
         </Text>
       </Flex>
 
-      <Flex px="16px" py="10px" gap="8px" alignItems="center">
+      <Flex px="24px" py="10px" gap="8px" alignItems="center">
         <Flex
           flex="1"
           align="center"
@@ -146,7 +147,7 @@ export default function RosterSidebar({ people, onClose }: RosterSidebarProps) {
 
       {/* Tabs */}
       <Flex
-        px="16px"
+        px="24px"
         gap="0"
         borderBottom="1px solid"
         borderColor="borderDefault"
@@ -158,43 +159,54 @@ export default function RosterSidebar({ people, onClose }: RosterSidebarProps) {
               key={tab.key}
               as="button"
               align="center"
-              gap="4px"
+              gap="6px"
               px="8px"
               pb="8px"
               pt="4px"
               cursor="pointer"
               borderBottom="2px solid"
-              borderColor={active ? "greenDot" : "transparent"}
+              borderColor={active ? "#5653FC" : "transparent"}
               onClick={() => setActiveTab(tab.key)}
               transition="border-color 0.15s"
             >
               <Text
                 fontSize="xs"
-                fontWeight={active ? "700" : "500"}
-                color={active ? "textPrimary" : "textMuted"}
+                fontWeight="600"
+                fontFamily="body"
+                style={{ color: active ? "#5653FC" : "#8492A6" }}
               >
                 {tab.label}
               </Text>
-              <Text
-                fontSize="xs"
-                fontWeight="600"
-                color={active ? "greenDot" : "textMuted"}
+              <Flex
+                w="20px"
+                h="20px"
+                borderRadius="50%"
+                align="center"
+                justify="center"
+                border="1px solid"
+                borderColor={active ? "#5653FC" : "borderDefault"}
               >
-                {tab.count}
-              </Text>
+                <Text
+                  fontSize="10px"
+                  fontWeight="700"
+                  style={{ color: active ? "#5653FC" : "#8492A6" }}
+                >
+                  {tab.count}
+                </Text>
+              </Flex>
             </Flex>
           );
         })}
       </Flex>
 
       {/* Person list */}
-      <Box maxH="680px" overflowY="auto" px="12px" py="8px">
-        {filtered.map((person) => (
+      <Box maxH="680px" overflowY="auto" px="16px" py="8px">
+        {filtered.map((person, idx) => (
           <Box
             key={person.id}
-            mb="8px"
-            px="14px"
-            py="14px"
+            mb="6px"
+            px="10px"
+            py="10px"
             borderRadius="md"
             border="1px solid"
             borderColor="borderDefault"
@@ -202,89 +214,120 @@ export default function RosterSidebar({ people, onClose }: RosterSidebarProps) {
             _hover={{ bg: "surface" }}
             transition="background 0.1s"
           >
-            <Flex gap="10px" align="flex-start">
-              <Flex
-                w="36px"
-                h="36px"
-                borderRadius="50%"
-                bg="surfaceSoft"
-                align="center"
-                justify="center"
-                flexShrink={0}
-                mt="2px"
-              >
-                <Text fontSize="xs" fontWeight="700" color="textSecondary">
-                  {person.initials}
-                </Text>
-              </Flex>
+            <Flex gap="8px" align="flex-start">
+              {idx % 2 === 0 ? (
+                <Flex
+                  w="32px"
+                  h="32px"
+                  borderRadius="50%"
+                  bg="surfaceSoft"
+                  align="center"
+                  justify="center"
+                  flexShrink={0}
+                  mt="2px"
+                >
+                  <Text fontSize="xs" fontWeight="600" color="textSecondary">
+                    {person.initials}
+                  </Text>
+                </Flex>
+              ) : (
+                <Box w="32px" flexShrink={0} />
+              )}
 
               <Box flex="1" minW="0">
-                <Flex align="center" justify="space-between" mb="4px">
+                <Flex align="center" justify="space-between" mb="2px">
                   <Text
-                    fontSize="sm"
-                    fontWeight="700"
+                    fontSize="xs"
+                    fontWeight="600"
                     color="textPrimary"
                     lineHeight="1.3"
+                    fontFamily="body"
                   >
                     {person.name}
                   </Text>
                   {person.status === "on-leave" && (
-                    <Text fontSize="10px" fontWeight="600" color="schedRedTag">
-                      • On leave
-                    </Text>
+                    <Flex
+                      align="center"
+                      gap="4px"
+                      px="6px"
+                      py="2px"
+                      borderRadius="10px"
+                      style={{ backgroundColor: ON_LEAVE_BG }}
+                    >
+                      <Box
+                        w="5px"
+                        h="5px"
+                        borderRadius="50%"
+                        style={{ backgroundColor: ON_LEAVE_COLOR }}
+                      />
+                      <Text
+                        fontSize="10px"
+                        fontWeight="600"
+                        style={{ color: ON_LEAVE_COLOR }}
+                      >
+                        On leave
+                      </Text>
+                    </Flex>
                   )}
                 </Flex>
 
-                <Flex gap="10px" mb="4px" align="center">
-                  <Text fontSize="10px" color="textMuted">
-                    <Text as="span" fontWeight="700" color="textSecondary">
-                      {person.contractHours.toFixed(1)}
+                <Flex gap="6px" mb="3px" align="center" justify="space-between">
+                  <Flex gap="6px" align="center">
+                    <Text fontSize="10px" color="textMuted" fontFamily="body">
+                      <Text as="span" fontWeight="600" color="textSecondary">
+                        {person.contractHours.toFixed(1)}
+                      </Text>
+                      hrs
                     </Text>
-                    hrs
-                  </Text>
-                  <Text fontSize="10px" color="textMuted">
-                    <Text as="span" fontWeight="700" color="textSecondary">
-                      {person.workedHours.toFixed(1)}
+                    <Text fontSize="10px" color="textMuted" fontFamily="body">
+                      <Text as="span" fontWeight="600" color="textSecondary">
+                        {person.workedHours.toFixed(1)}
+                      </Text>
+                      hrs
                     </Text>
-                    hrs
-                  </Text>
+                  </Flex>
+
+                  <Flex gap="3px" flexShrink={0}>
+                    {person.weekDays.map((day, i) => {
+                      const pill = WEEKDAY_STYLE[day.label] ?? {
+                        bg: "#F9FAFB",
+                        color: "#8492A6",
+                      };
+                      return (
+                        <Flex
+                          key={i}
+                          w="22px"
+                          h="20px"
+                          borderRadius="50%"
+                          align="center"
+                          justify="center"
+                          style={{ backgroundColor: pill.bg }}
+                        >
+                          <Text
+                            fontSize="10px"
+                            fontWeight="600"
+                            style={{ color: pill.color }}
+                          >
+                            {day.label}
+                          </Text>
+                        </Flex>
+                      );
+                    })}
+                  </Flex>
                 </Flex>
 
                 {/* Date range */}
                 <Text
                   fontSize="10px"
                   fontWeight="600"
-                  color={
-                    person.status === "on-leave" ? "schedRedTag" : "greenDot"
-                  }
-                  mb="8px"
+                  fontFamily="body"
+                  style={{
+                    color:
+                      person.status === "on-leave" ? ON_LEAVE_COLOR : "#37A55C",
+                  }}
                 >
                   {person.dateRange}
                 </Text>
-
-                <Flex gap="6px">
-                  {person.weekDays.map((day, i) => (
-                    <Flex
-                      key={i}
-                      w="26px"
-                      h="22px"
-                      borderRadius="4px"
-                      align="center"
-                      justify="center"
-                      style={{
-                        backgroundColor: DAY_BG_HEX[day.color],
-                      }}
-                    >
-                      <Text
-                        fontSize="10px"
-                        fontWeight="600"
-                        style={{ color: DAY_COLOR_HEX[day.color] }}
-                      >
-                        {day.label}
-                      </Text>
-                    </Flex>
-                  ))}
-                </Flex>
               </Box>
             </Flex>
           </Box>

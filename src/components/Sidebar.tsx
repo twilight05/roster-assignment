@@ -1,12 +1,14 @@
 "use client";
 
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import { HamburgerMenu } from "iconsax-reactjs";
+import { useState } from "react";
 import { navItems } from "@/navigation";
 import SidebarItem from "./SidebarItem";
 
-export default function Sidebar() {
+const Sidebar = () => {
+  const [activeTab, setActiveTab] = useState(() => navItems[0].label);
   return (
     <Box
       as="aside"
@@ -45,14 +47,59 @@ export default function Sidebar() {
       </Flex>
 
       <Box flex="1" py="12px">
-        {navItems.map((item) => (
-          <SidebarItem
-            key={item.label}
-            item={item}
-            defaultExpanded={item.label === "Rooster"}
-          />
-        ))}
+        {navItems.map((item) => {
+          if (item.children) {
+            return (
+              <SidebarItem
+                key={item.label}
+                item={item}
+                defaultExpanded={item.label === activeTab}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+              />
+            );
+          }
+          const isActive = activeTab === item.label;
+          return (
+            <Flex
+              key={item.label}
+              align="center"
+              px="20px"
+              py="10px"
+              cursor="pointer"
+              _hover={{ bg: "surface" }}
+              bg={isActive ? "sidebarActiveBg" : "transparent"}
+              gap="12px"
+              mb="2px"
+              transition="background 0.15s"
+              onClick={() => setActiveTab(item.label)}
+            >
+              <Image
+                src={item.icon}
+                alt={item.label}
+                width={20}
+                height={20}
+                style={{
+                  filter: isActive
+                    ? "invert(27%) sepia(81%) saturate(749%) hue-rotate(221deg) brightness(92%) contrast(92%)"
+                    : "none",
+                }}
+              />
+              <Text
+                fontFamily="body"
+                fontSize="lg"
+                color={isActive ? "sidebarAccent" : "sidebarText"}
+                fontWeight="700"
+                lineHeight="100%"
+              >
+                {item.label}
+              </Text>
+            </Flex>
+          );
+        })}
       </Box>
     </Box>
   );
-}
+};
+
+export default Sidebar;

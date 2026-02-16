@@ -11,11 +11,19 @@ import type { NavItem } from "@/navigation";
 interface Props {
   item: NavItem;
   defaultExpanded?: boolean;
+  activeTab?: string;
+  setActiveTab?: (label: string) => void;
 }
 
-export default function SidebarItem({ item, defaultExpanded = false }: Props) {
+export default function SidebarItem({
+  item,
+  defaultExpanded = false,
+  activeTab,
+  setActiveTab,
+}: Props) {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const isActive = activeTab === item.label;
 
   if (item.children) {
     return (
@@ -26,16 +34,30 @@ export default function SidebarItem({ item, defaultExpanded = false }: Props) {
           py="10px"
           cursor="pointer"
           _hover={{ bg: "surface" }}
-          onClick={() => setExpanded((v) => !v)}
+          bg={isActive ? "sidebarActiveBg" : "transparent"}
           gap="12px"
           transition="background 0.15s"
+          onClick={() => {
+            setExpanded((v) => !v);
+            setActiveTab && setActiveTab(item.label);
+          }}
         >
-          <Image src={item.icon} alt={item.label} width={20} height={20} />
+          <Image
+            src={item.icon}
+            alt={item.label}
+            width={20}
+            height={20}
+            style={{
+              filter: isActive
+                ? "invert(27%) sepia(81%) saturate(749%) hue-rotate(221deg) brightness(92%) contrast(92%)"
+                : "none",
+            }}
+          />
           <Text
             flex="1"
             fontFamily="body"
             fontSize="lg"
-            color={expanded ? "textPrimary" : "sidebarText"}
+            color={isActive ? "sidebarAccent" : "sidebarText"}
             fontWeight="700"
             lineHeight="100%"
           >
