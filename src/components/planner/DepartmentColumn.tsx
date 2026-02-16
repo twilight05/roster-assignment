@@ -14,6 +14,7 @@ export interface CardData {
   tagColor: string;
   bgColor: string;
   borderColor: string;
+  staffColor: string;
 }
 
 export interface SeeAllIndicator {
@@ -87,6 +88,8 @@ interface DepartmentColumnProps {
   cards: CardData[];
   seeAll?: SeeAllIndicator;
   showBorderRight?: boolean;
+  onCardClick?: (cardId: string) => void;
+  onSeeAllClick?: (slotIndex: number) => void;
 }
 
 const CARD_GAP = 6;
@@ -101,6 +104,8 @@ export default function DepartmentColumn({
   cards,
   seeAll,
   showBorderRight = true,
+  onCardClick,
+  onSeeAllClick,
 }: DepartmentColumnProps) {
   const pxPerMinute = slotHeight / slotMinutes;
   const totalHeight = totalSlots * slotHeight;
@@ -114,8 +119,6 @@ export default function DepartmentColumn({
     seeAll && seeAll.slotIndex >= 0 && seeAll.slotIndex < totalSlots;
   const seeAllLaneIdx = seeAll?.laneIndex ?? 0;
   const seeAllLanes = seeAll?.laneCount ?? 1;
-  const seeAllLeft = `calc(${CARD_PAD}px + ${seeAllLaneIdx} * (100% - ${2 * CARD_PAD}px) / ${seeAllLanes})`;
-  const seeAllWidth = `calc((100% - ${2 * CARD_PAD}px) / ${seeAllLanes} - ${CARD_GAP}px)`;
 
   return (
     <Box
@@ -165,6 +168,8 @@ export default function DepartmentColumn({
             tagColor={card.tagColor}
             bgColor={card.bgColor}
             borderColor={card.borderColor}
+            staffColor={card.staffColor}
+            onClick={onCardClick ? () => onCardClick(card.id) : undefined}
             style={{
               position: "absolute",
               top: `${top}px`,
@@ -192,6 +197,9 @@ export default function DepartmentColumn({
           cursor="pointer"
           zIndex={2}
           _hover={{ bg: "surfaceSoftHover" }}
+          onClick={
+            onSeeAllClick ? () => onSeeAllClick(seeAll!.slotIndex) : undefined
+          }
           style={{
             top: `${seeAll!.slotIndex * slotHeight + (slotHeight - 64) / 2}px`,
             left: `calc(${CARD_PAD}px + ${seeAllLaneIdx} * (100% - ${2 * CARD_PAD}px) / ${seeAllLanes})`,

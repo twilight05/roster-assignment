@@ -53,12 +53,7 @@ export default function Navbar() {
           />
         </Box>
 
-        <Flex
-          alignItems="center"
-          gap="8px"
-          cursor="p
-        ointer"
-        >
+        <Flex alignItems="center" gap="8px" cursor="pointer">
           <Box>
             <Text
               fontFamily="body"

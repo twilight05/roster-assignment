@@ -11,7 +11,9 @@ interface ScheduleCardProps {
   tagColor: string;
   bgColor: string;
   borderColor: string;
+  staffColor: string;
   style?: CSSProperties;
+  onClick?: () => void;
 }
 
 export default function ScheduleCard({
@@ -22,15 +24,15 @@ export default function ScheduleCard({
   tagColor,
   bgColor,
   borderColor,
+  staffColor,
   style,
+  onClick,
 }: ScheduleCardProps) {
   return (
     <Box
       bg={bgColor}
       border="1px solid"
       borderColor={borderColor}
-      borderLeft="3px solid"
-      borderLeftColor={borderColor}
       borderRadius="md"
       pt="10px"
       pb="10px"
@@ -42,13 +44,23 @@ export default function ScheduleCard({
       zIndex={2}
       minH="24px"
       style={style}
+      onClick={onClick}
     >
       <Flex align="center" gap="8px" mb="4px">
-        <Box px="6px" py="2px" borderRadius="4px" bg={tagColor} flexShrink={0}>
-          <Text fontSize="10px" fontWeight="700" color="white">
+        <Flex
+          w="28px"
+          h="28px"
+          borderRadius="50%"
+          bg="white"
+          align="center"
+          justify="center"
+          flexShrink={0}
+          style={{ border: `1.5px solid var(--colors-${borderColor})` }}
+        >
+          <Text fontSize="10px" fontWeight="700" color="textMuted">
             {tag}
           </Text>
-        </Box>
+        </Flex>
       </Flex>
 
       <Text fontSize="sm" fontWeight="600" color="textPrimary" lineHeight="1.3">
@@ -60,7 +72,7 @@ export default function ScheduleCard({
       </Text>
 
       {staff && (
-        <Text fontSize="xs" color="staffLink" mt="2px">
+        <Text fontSize="xs" color={staffColor} mt="2px">
           {staff}
         </Text>
       )}

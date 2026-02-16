@@ -97,27 +97,22 @@ export const system = createSystem(defaultConfig, {
         liveBorder: { value: "#FF6669" },
         liveChip: { value: "#FF4D4F" },
 
+        modeChipLive: { value: "#FF383C" },
+        modeChipPlanner: { value: "#5653FC" },
+
         greenDot: { value: "#10B981" },
 
         schedOrangeBg: { value: "#FDF5F0" },
-        schedOrangeBorder: { value: "#FDBA74" },
+        schedOrangeBorder: { value: "#E35F00" },
         schedOrangeTag: { value: "#E35F00" },
 
         schedGreenBg: { value: "#F1FBF4" },
-        schedGreenBorder: { value: "#86EFAC" },
+        schedGreenBorder: { value: "#19C34C" },
         schedGreenTag: { value: "#19C34C" },
 
-        schedBlueBg: { value: "#EFF6FF" },
-        schedBlueBorder: { value: "#93C5FD" },
-        schedBlueTag: { value: "#3B82F6" },
-
-        schedPurpleBg: { value: "#F5F3FF" },
-        schedPurpleBorder: { value: "#C4B5FD" },
-        schedPurpleTag: { value: "#8B5CF6" },
-
-        schedRedBg: { value: "#FEF2F2" },
-        schedRedBorder: { value: "#FCA5A5" },
-        schedRedTag: { value: "#EF4444" },
+        schedYellowBg: { value: "#F9F9F1" },
+        schedYellowBorder: { value: "#A19712" },
+        schedYellowTag: { value: "#A19712" },
 
         daysBadgeBg: { value: "#E6F9F0" },
         daysBadgeBorder: { value: "#B2EDCE" },

@@ -19,13 +19,11 @@ const colorMap: Record<ShiftColor, ColorTokens> = {
     bg: "schedGreenBg",
     border: "schedGreenBorder",
   },
-  blue: { tag: "schedBlueTag", bg: "schedBlueBg", border: "schedBlueBorder" },
-  purple: {
-    tag: "schedPurpleTag",
-    bg: "schedPurpleBg",
-    border: "schedPurpleBorder",
+  yellow: {
+    tag: "schedYellowTag",
+    bg: "schedYellowBg",
+    border: "schedYellowBorder",
   },
-  red: { tag: "schedRedTag", bg: "schedRedBg", border: "schedRedBorder" },
 };
 
 export function resolveColor(color: ShiftColor): ColorTokens {
@@ -45,5 +43,6 @@ export function shiftToCard(shift: Shift): CardData {
     tagColor: tokens.tag,
     bgColor: tokens.bg,
     borderColor: tokens.border,
+    staffColor: tokens.border,
   };
 }
